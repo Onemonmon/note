@@ -156,25 +156,6 @@ V8将堆内存分为
 ### 9. EventLoop 事件循环
 
 ```
-JS是单线程的，同一时刻只能有一个代码段在主线程（浏览器提供的JS引擎线程）的执行栈上执行，而异步任务则是在浏览器（多线程）提供的其他线程上执行，如setTimeout（定时器线程）、网络请求（HTTP线程）等。
-
-JS解析代码的时候会将同步代码按顺序放入执行栈中，依次执行栈中的函数，如果遇到一些异步代码，浏览器会将这些异步代码放到对应线程中执行，且不阻塞主线程，当异步代码执行完成后，会将它的回调函数放入任务队列中等待执行，当执行栈中的代码执行完毕后，就会检查任务队列中是否有任务要执行，有则会将该任务放到执行栈中执行，如果期间又遇到异步任务则再交给其他线程去执行，如此循环。
-
-浏览器的任务队列分为宏任务队列和微任务对列，分别处理宏任务和微任务
-宏任务：setTimeout、setInterval、setImmediate、I/O（文件读取、网络请求）
-有明确的异步任务需要执行和回调，需要浏览器提供的其他线程支持
-微任务：Promise.then、async/await、queueMicrotask、process.nextTick
-没有明确的异步任务需要执行，只有回调（改变代码执行顺序），有也只是在微任务中嵌套了宏任务，不需要浏览器提供的其他线程支持
-
-具体流程为：
-执行栈执行完所有同步代码后，会先检查微任务队列是否有任务要执行，有则执行，过程中新增的微任务会在此次事件循环中执行，新增的宏任务则放入宏任务队列等待下次事件循环，没有微任务再检查宏任务队列是否有任务要执行，有则取队首任务执行，如此往复。
-```
-
-```
-定时器误差：当浏览器定时器线程完成计时后，触发定时器事件，将回调存入宏任务队列，等待主线程空闲后执行，如果此时主线程还在执行同步代码或者微任务，那就导致定时器回调无法按时执行而导致误差。
-```
-
-```
 NodeJS中的事件循环分为6个阶段：
 > timers阶段：执行setTimeout、setInterval回调
 > pending callbacks阶段：执行上一轮循环未执行的I/O回调
@@ -190,41 +171,9 @@ NodeJS中的事件循环分为6个阶段：
 每个阶段结束后都会执行中间队列，先执行nextTick队列，再执行Promise队列
 ```
 
-### 10.  cookie、localStorage、sessionStorage
 
-```
-1. cookie可设置失效时间，未设置时默认关闭浏览器后清除；localStorage只能代码或手动清除；sessionStorage在关闭tab页或浏览器时清除
-2. cookie可存放4KB，localStorage、sessionStorage可存放5MB
-3. cookie会自动携带在http请求头中，localStorage、sessionStorage不参与和服务器的通信
-```
 
-### 11. 跨域解决方案
 
-```
-同源：协议、域名、端口相同
-跨域：当前网站试图执行其他不同源网站的脚本时，由于浏览器的同源策略而无法访问
-```
 
-```
-CORS跨域资源共享
-服务端设置Access-Control-Allow-origin: 允许跨域访问的域名/*
-此时发送的请求会分为
-> 简单请求：
-  请求方法为Head、Get、Post
-  content-type为text/plain、multiple/form-data、application/x-www-form-urlencoded
-> 复杂请求：
-  发送复杂请求前，浏览器会先发送OPTION预检请求，用于判读服务器是否允许跨域，服务器接收到OPTION请求后，会检查Origin、Access-Control-Request-Method、Access-Control-Allow-Header字段，决定是否允许跨域
-```
 
-```
-Node中间件代理
-原理：同源策略是浏览器需要遵循的标准，而如果是服务器向服务器请求就无需遵循同源策略
-本地使用webpack.devServer中的proxy配置
-http-proxy-middleware中间件
-```
-
-```
-Nginx反向代理
-通过Nginx配置一个代理服务器（同域名不同端口），设置location.proxy_pass
-```
 

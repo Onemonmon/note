@@ -14,6 +14,8 @@
 把文件从暂存区提交到本地库
   git commit -m '提交说明' 文件（夹）路径
   git commit -m '提交说明'
+撤销提交到本地库的commit
+  git reset --soft HEAD^
 查看版本信息
   git reflog
   git log #详细版本信息
