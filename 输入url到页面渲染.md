@@ -173,34 +173,67 @@ GET会被浏览器主动缓存
 ```
 
 ```
-1. 通过CORS（跨域资源共享）处理
-   服务端配置响应头：
-   	 Accept-Control-Allow-Origin
-   	 Accept-Control-Allow-Credentials（是否允许发送cookie）
-   	 
-   简单请求：
-   > 请求方法只限：HEAD、GET、POST
-   > 请求头字段只限：
-   		Accept
-   		Accept-Language
-   		Content-Length
-   		Content-Type: 
-   			application/x-www-form-unlencoded（普通form表单提交）
-   			multipart/form-data（发送文件）
-   			text/plain
-   
-   其他为复杂请求，处理复杂请求的CORS时，会先发送预检请求OPTIONS
-   预检请求头：Accept-Control-Request-Method（CORS请求的方法）、Accept-Control-Request-Headers（CORS请求携带的额外头信息字段）
-   预检响应头：Accept-Control-Allow-Methods（服务器所支持的CORS请求的方法）、Accept-Control-Allow-Headers（服务器所支持的CORS请求的所有头信息字段）
-   
-2. 通过Nginx反向代理
-```
-
-```
 跨域请求如何携带cookie？
    配置请求头withCredentials: true
    配置响应头Access-Control-Allow-Origin: */http...
    配置响应头Access-Control-Allow-Credentials: true
+```
+
+**开发环境跨域**
+
+```javascript
+// 通过配置对应脚手架的开发服务器
+devServer: {
+	proxy: {
+        "/api": {
+        	target: "http://test.com/", // 跨域的地址，可以是域名和IP
+        	changeOrigin: true, // target是域名的时候需要设置
+            pathRewrite: { // 路径重写，去掉/api
+                "^/api": ""
+            }
+        }
+    }  
+}
+```
+
+**CORS（跨域资源共享）**
+
+```
+> 服务端配置响应头：
+  Accept-Control-Allow-Origin: */http...
+  Accept-Control-Allow-Credentials: true（跨域后是否允许携带cookie）
+   	 
+> 简单请求
+  请求方法属于：HEAD、GET、POST
+  请求头只包含安全字段如：Accept、Accept-Language、Content-Length、Content-Type...
+  请求头如果包含Content-Type，其值只限于：
+    application/x-www-form-unlencoded（普通form表单提交）
+   	multipart/form-data（发送文件）
+   	text/plain
+   
+> 复杂请求
+  其他为复杂请求，浏览器会先发送预检请求OPTIONS，询问服务器是否允许访问
+  预检请求头：
+    Accept-Control-Request-Method（CORS请求的方法）
+    Accept-Control-Request-Headers（CORS请求携带的额外头信息字段）
+  预检响应头：
+    Accept-Control-Allow-Methods（服务器所支持的CORS请求的方法）
+    Accept-Control-Allow-Headers（服务器所支持的CORS请求的所有头信息字段）
+    Access-Control-Max-Age（告诉浏览器在一定时间段内，对于同样的源、方法、请求头都不需要发送OPTIONS）
+```
+
+**Nginx反向代理**
+
+```nginx
+server {
+    listen	80; 
+    server_name	'test.com'; #服务器域名
+    location / {
+        root html;
+        index index.html index.htm;
+        proxy_pass http://localhost:8080; #前端地址
+    }
+}
 ```
 
 #### 3. 服务器返回请求结果
@@ -318,7 +351,7 @@ const newWindow = window.open("https://www.baidu.com")
 浏览器进程进行页面绘制，显示到屏幕上
 
 ```
-重排：
+重排
 > 添加或删除可见的DOM元素
 > 元素尺寸改变
   margin、padding、border、width、height
@@ -327,12 +360,13 @@ const newWindow = window.open("https://www.baidu.com")
 > 浏览器窗口大小改变
 > 查询元素几何信息
   clientHeight、offsetHeight、scrollHeight、getBoundingClientRect()
-重绘：
+
+重绘
 > color、border-style、visibility、background
 ```
 
 ```
-避免回流、重绘
+避免重排、重绘
 1. 避免使用display:table布局
 2. 避免频繁操作style，可通过class类名操作样式
 3. 尽量使用transform代替动画里的位置变化，使用opacity代替visibility
