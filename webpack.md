@@ -11,11 +11,9 @@
 
 ### 2. 自定义loader
 
-```
 loader对模块的源代码进行转换，允许我们打包除js外的文件
 loader的编写应遵循单一功能原则，一个loader实现一个功能
 loader的匹配执行顺序为从下到上、从右到左
-```
 
 ```javascript
 // src/loaders/my-loader.js
@@ -52,9 +50,7 @@ module.exports = function myLoader(source) {
 
 ### 3. 自定义Plugin
 
-```
 webpack在编译过程中会暴露很多生命周期钩子函数，plugin通过调用这些钩子，能够在编译的特定环节对模块进行处理
-```
 
 ```javascript
 // 编译结束后创建一个文件来显示dist下的文件信息

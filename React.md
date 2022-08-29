@@ -25,18 +25,14 @@ componentWillUnmount
 ### 2. setState
 
 ```jsx
-this.setState({
-	...
-})
-this.setState((state, props) => ({
-	...
-}))
+this.setState({ ... })
+this.setState((state, props) => ({ ... }))
 在同步代码中，setState会将多个state合并处理，useState不会进行合并处理，都只执行一次render
 在异步代码中，setState、useState都各自执行一次render
 ```
 
 ```
-setState并不是单纯同步或异步的，在生命周期函数、合成事件中表现为异步，在setTimeout、DOM原生事件函数中表现为同步。
+setState并不是单纯同步或异步的，在生命周期函数、合成事件中表现为异步，在setTimeout、DOM原生事件函数中表现为同步，在V18版本中统一变成异步了。
 React内部通过isBatchingUpdates变量判断是否开启批量更新，在执行生命周期、合成事件时先将isBatchingUpdates置为true，此时setState不会直接更新，而是先进入队列等待批量更新，当函数执行完毕后再将isBatchingUpdates置为false，因为isBatchingUpdates的值是在同步代码中修改的，所以在异步代码中使用setState时，由于isBatchingUpdates早已置为false，导致批量更新失效，而setTimeout、DOM原生事件本身就不受React控制，所以也不会进行批量更新。
 ```
 
@@ -250,14 +246,5 @@ componentDidMount、getSnapShotBeforeUpdate、componentDidUpdate
 首先React向浏览器请求调度，浏览器在一帧的内容执行完成后还有剩余时间，会去判断是否有待执行任务，没有的话就继续执行下一帧，有则将控制权交给React，让其执行任务，当执行完一个任务后若还有剩余时间，且还有待执行任务，则会继续执行下一个任务，没有剩余时间了则会归还控制权，当协调阶段的任务没在当前时间片内执行完则会被中断，等待下一次调度时再执行。
 ```
 
-```
-浏览器一帧
-1. 处理输入事件
-2. 处理定时器
-3. 处理Begin Frame（开始帧），即每一帧的事件，包括window.resize、scroll等
-4. 执行requestAnimationFrame
-5. 布局
-6. 绘制
-7. 执行requestIdleCallback里注册的回调
-```
+
 

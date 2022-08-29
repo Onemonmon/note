@@ -362,10 +362,11 @@ const newWindow = window.open("https://www.baidu.com")
   clientHeight、offsetHeight、scrollHeight、getBoundingClientRect()
 
 重绘
-> color、border-style、visibility、background
-```
+> color
+> border-style
+> visibility
+> background
 
-```
 避免重排、重绘
 1. 避免使用display:table布局
 2. 避免频繁操作style，可通过class类名操作样式
@@ -374,4 +375,6 @@ const newWindow = window.open("https://www.baidu.com")
 5. 避免重复读取元素的几何信息，可以用变量暂存
 6. 开启GPU加速
 ```
+
+
 

@@ -1,107 +1,216 @@
-### 1. 数据类型
+### 数据类型
 
-```
-基本类型：String、Number、Boolean、Symbol、Null、Undefined、Bigint
-变量名和值都保存在栈内存中
+#### 基本类型
 
-引用类型：Object、Array、Function、Date、RegExp
-变量名和值的存储地址保存在栈内容中，值保存在堆内存中
-```
+String、Number、Boolean、Null、Undefined、Symbol、BigInt
 
-```
+##### Symbol
+
+```javascript
 Symbol用于生成一个唯一值，不能使用new Symbol()
 Symbol() !== Symbol()
 Symbol.for('name') === Symbol.for('name')
 Symbol.for(key)方法会将创建的symbol放入全局的symbol注册表中，并且使用Symbol.for(key)时，不会每次都创建新的symbol，而是会先判断给定的key是否在注册表中，有则直接返回，否则再重新创建
 ```
 
+##### BigInt
+
 ```
 Bigint用于表示一个任意精度的整数，不能使用new Bigint()
-Bigint数据需添加后缀n（12n）
+Bigint数据需添加后缀n（BigInt(12) => 12n）
 12n == 12
 12n !== 12
 如果与Number混合运算则需要类型转换
 ```
 
-```
-检测数据类型的方法：
-> typeof
-  能快速区分基本数据类型，但无法区分Object、Array、Null，都返回Object
-> instanceof
-  能区分Object、Array、Function，适用于判断自定义类实例，但无法判断基本数据类型
-> Object.prototype.toString.call()
-  精准判断
-```
+#### 引用类型
 
-### 2. 变量声明
+Object、Array、Function、Date、RegExp、Map、WeakMap、Set、WeakSet
 
-```
-> var
-  没有块级作用域，可以跨域访问
-  可以先使用后声明（存在变量提升：JS执行前会将var、function的变量提前声明）
-  可以重复声明，后面重复声明的变量会覆盖之前的
-  var定义的全局变量会绑定在顶层对象window上
-> let
-  先定义后使用（存在暂时性死区：let的块级作用域开始，到初始化的位置），在暂时性死区中使用变量会报错
-  不可重复声明
-> const
-  不可重复声明
-  声明时必须初始化
-  声明的常量不可重新赋值，但其只保证了变量名指向的地址不变，不能保证该地址保存的数据不变
-```
-
-### 3. 作用域与作用域链
-
-```
-作用域是代码运行过程中某些变量、函数的访问范围，用于隔离变量
-> 全局作用域
-  在代码的任何位置都能访问到的变量具有全局作用域
-  包括：最外层函数、最外层变量、未定义就直接赋值的变量、window对象及属性
-> 函数作用域
-  在函数内部声明的变量拥有函数作用域，外层作用域无法访问内层作用域的变量
-> 块级作用域
-  ES6新增，通过let、const声明变量拥有块级作用域
-```
-
-```
-作用域链：使用变量时现在当前函数作用域中取值，如果没有找到，则会向上级作用域（若是函数，则要到创建这个函数的作用域去找）查找，直到查到全局作用域
-```
-
-### 4. 闭包
-
-```
-闭包是指有权访问另一个函数中的变量的函数，因为变量被引用，所以另一个函数执行结束后，变量不会被回收，因此可以用来封装一个私有变量。
-形成条件：函数的嵌套、内部函数使用了外部函数的局部变量
-作用：保护函数的私有变量不受外部干扰，可以实现函数内部方法和变量的私有化
-闭包函数使用后应该及时清除引用（置为null），不正当的使用闭包会造成内存泄漏
-```
-
-### 5. this指向
-
-```
-普通函数执行时，this指向window
-当函数作为对象的方法执行时，this指向该对象
-使用new调用时，this指向内部创建的对象
-箭头函数的this会继承自定义时的外层函数的this，如果没有外层函数则指向window
-DOM事件函数的this指向绑定事件的DOM元素
-call、apply、bind动态绑定this
-```
-
-### 6. 原型与原型链
-
-```
-每个class和（非箭头）函数都有prototype原型对象，它有一个默认的constructor属性，用于记录实例是由哪个构造函数创建的
-每个对象都有__proto__属性，它是一个对象，指向上层对象的原型对象，有constructor、__proto__两个属性
-```
+##### Map
 
 ```javascript
-Person.prototype.constructor === Person
-p.__proto__ === Person.prototype
-Person.prototype.__proto__ === Object.prototype
-Object.prototype.__proto__ === null
+const map = new Map()
+// new Map([[key1, value1], [key2, value2]])
+// Map的键key可以是任意类型的数据
+map.set(key, value)
+map.has(key)
+map.get(key)
+map.delete(key)
+// 获取数据个数
+map.size
+// 遍历Map
+const keys = map.keys() // [key1, key2]
+const values = map.values() // [value1, value2]
+const entries = map.entries() // [[key1, value1], [key2, value2]]
+map.forEach((value, key) => {})
+// 清空集合
+map.clear()
 ```
 
+##### WeakMap
 
+```javascript
+const wmap = new WeakMap()
+// new WeakMap([[key1, value1], [key2, value2]])
+// WeakMap的键名key只能是引用类型
+let objectKey = { name: "lala", age: 18 }
+wmap.set(objectKey, value)
+wmap.has(objectKey)
+wmap.get(objectKey)
+wmap.delete(objectKey)
+// key对应的引用被释放后，WeakMap中的键值对也会删除
+objectKey = null
+wmap.has(objectKey) // false
+// WeakMap不可枚举，不存在遍历方法，不能获取size，不能clear
+```
+
+##### Set
+
+```javascript
+const set = new Set()
+// new Set([value1, value2])
+// Set的值可以是任意类型的数据
+set.add(value)
+set.has(value)
+set.delete(value)
+// 获取数据个数
+set.size
+// 遍历Set
+set.forEach((value) => {})
+// 清空集合
+set.clear()
+```
+
+##### WeakSet
+
+```javascript
+const wset = new WeakSet()
+// new WeakSet([value1, value2])
+// WeakSet的值只能是引用类型
+let objectValue = { name: "lala", age: 18 }
+wset.add(objectValue)
+wset.has(objectValue)
+wset.delete(objectValue)
+// WeakSet不可枚举，不存在遍历方法，不能获取size，不能clear
+```
+
+#### 检测数据类型
+
+##### typeof
+
+能快速区分基本数据类型，但无法区分Object、Array、Null，都返回object
+
+```javascript
+typeof "str" === 'string'
+typeof 100 === 'number'
+typeof true === 'boolean'
+typeof undefined === 'undefined'
+typeof Symbol() === 'symbol'
+typeof BigInt() === 'bigint'
+typeof function(){} === 'function'
+typeof null === 'object'
+typeof Object、Array、Date、RegExp、Map、WeakMap、Set、WeakSet === 'object'
+```
+
+##### instanceof
+
+适用于判断自定义类的实例，但无法判断基本数据类型
+
+```javascript
+// 引用类型 instanceof Object === true 所以无法判断是否是普通对象
+({}) instanceof Object === true
+([]) instanceof Object === true
+([]) instanceof Array === true
+```
+
+##### Object.prototype.toString.call
+
+可以精准判断所有类型，返回`"[object Xxx]"`
+
+### 变量声明
+
+##### var
+
+```
+1. 没有块级作用域，可以跨域访问
+2. 可以先使用后声明（存在变量提升：JS执行前会将var、function的变量提前声明）
+3. 可以重复声明，后面重复声明的变量会覆盖之前的
+4. var定义的全局变量会绑定在顶层对象window上
+```
+
+##### let
+
+```
+1. 不可重复声明
+2. 先定义后使用（存在暂时性死区：let的块级作用域开始，到初始化的位置），在暂时性死区中使用变量会报错
+```
+
+##### const
+
+```
+1. 不可重复声明
+2. 声明时必须初始化 const name = ''
+3. 声明的常量不可重新赋值，值如果是对象，对象中的属性值可以改变
+```
+
+### 作用域
+
+代码运行过程中对变量、函数的访问范围。
+
+##### 全局作用域
+
+在代码的任何位置都能访问到的变量具有全局作用域，包括：最外层函数、最外层变量、未定义就直接赋值的变量、window对象及属性。
+
+##### 函数作用域
+
+在函数内部声明的变量拥有函数作用域。
+
+##### 块级作用域
+
+通过let、const声明的变量拥有块级作用域。
+
+##### 作用域链
+
+使用变量时，先在当前函数作用域中取值，如果没有找到，则会向上级作用域（若是函数，则要到创建这个函数的作用域去找）查找，直到查到全局作用域。
+
+### 闭包
+
+```
+定义：在函数A中定义并返回了函数B，使得函数B能访问到函数A中声明的变量，函数B执行时就会形成闭包，闭包函数使用后应该及时清除引用（置为null），否则造成内存泄漏。
+
+作用：实现函数内部方法和变量的私有化
+
+应用场景：节流、防抖、函数柯里化、vue3生命周期的定义
+```
+
+### this指向
+
+```
+1. 普通函数执行时fn()，this指向window
+2. 当函数作为对象的方法执行时，this指向该对象
+3. 使用new调用时，this指向构造函数内部创建的对象
+4. 箭头函数的this指向定义时的外层函数的this，如果没有外层函数则指向window
+5. DOM事件函数的this指向绑定事件的DOM元素
+6. call、apply、bind动态绑定this
+```
+
+### 原型与原型链
+
+![](C:\Users\one\Pictures\Saved Pictures\assets\images\prototype.webp)
+
+```javascript
+function Foo() {}
+const f1 = new Foo()
+// 原型对象Foo.prototype的constructor指向构造函数本身
+Foo.prototype.constructor === Foo
+// 实例f1的原型__proto__指向原型对象Foo.prototype
+f1.__proto__ === Foo.prototype
+// 原型对象Foo.prototype本身也是个对象
+Foo.prototype.__proto__ === Object.prototype
+// 原型链的尽头
+Object.prototype.__proto__ === null
+```
 
 ### 9. EventLoop 事件循环
 
