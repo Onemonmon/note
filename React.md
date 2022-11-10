@@ -45,6 +45,8 @@ React内部通过isBatchingUpdates变量判断是否开启批量更新，在执�
 4. redux
 ```
 
+##### context
+
 ```jsx
 const MyContext = React.createContext()
    
@@ -80,12 +82,16 @@ function D() {
 }
 ```
 
-```jsx
+##### Redux
+
+```javascript
 // actions/count-action-types.js
 export const INCREMENT = 'INCREMENT';
 export const ASYNC_INCREMENT = 'ASYNC_INCREMENT';
 export const DECREMENT = 'DECREMENT';
+```
 
+```javascript
 // actions/count-action.js
 import { INCREMENT, DECREMENT, ASYNC_INCREMENT } from 'actions/count-action-types.js'
 export const increment = { type: INCREMENT }
@@ -98,7 +104,9 @@ export const asyncIncrement = async (dispatch) => {
     payload: res.data
   })
 }
+```
 
+```javascript
 // reducers/count-reducer.js
 import { INCREMENT, DECREMENT, ASYNC_INCREMENT } from 'actions/count-action-types.js'
 export default function(state = { count: 1 }, action) {
@@ -113,7 +121,9 @@ export default function(state = { count: 1 }, action) {
             return state
     }
 }
+```
 
+```javascript
 // store.js
 import { createStore, combineReducers, compose, applyMiddleware } from 'redux'
 import countReducer from 'reducers/count-reducer.js'
@@ -127,7 +137,9 @@ const store = createStore(
     compose(applyMiddleware(...[thunk]))
 )
 export default store
+```
 
+```jsx
 // App.tsx
 import store from 'store.js'
 ReactDOM.render((
